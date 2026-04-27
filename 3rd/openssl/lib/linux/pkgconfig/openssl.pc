@@ -1,0 +1,9 @@
+prefix=/root/endeavor/shortcoder/common-libs/3rd/openssl
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib/linux
+includedir=${prefix}/include
+
+Name: OpenSSL
+Description: Secure Sockets Layer and cryptography libraries and tools
+Version: 1.1.1w
+Requires: libssl libcrypto

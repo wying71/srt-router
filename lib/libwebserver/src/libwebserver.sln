@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwebserver", "libwebserver.vcxproj", "{F0A0E46C-90B3-4E8A-A503-D36B37969A71}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F0A0E46C-90B3-4E8A-A503-D36B37969A71}.Debug|x64.ActiveCfg = Debug|x64
+		{F0A0E46C-90B3-4E8A-A503-D36B37969A71}.Debug|x64.Build.0 = Debug|x64
+		{F0A0E46C-90B3-4E8A-A503-D36B37969A71}.Release|x64.ActiveCfg = Release|x64
+		{F0A0E46C-90B3-4E8A-A503-D36B37969A71}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {717D2124-F39F-4F18-999C-ED0381812FD3}
+	EndGlobalSection
+EndGlobal

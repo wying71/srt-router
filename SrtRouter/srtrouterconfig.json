@@ -1,0 +1,25 @@
+{
+  "srt": {
+    "enable": true,
+    "listenPort": 8890,
+    "encryptions": [
+      {
+        "path": "*",
+        "publishPassphrase": "",
+        "requestPassphrase": "",
+        "encryptionType": ""
+      }
+    ]
+  },
+  "api": {
+    "enable": true,
+    "listenPort": 3000
+  },
+  "logging": {
+    "logLevel": "info",
+    "logFilePath": "logs/srtRouter.log",
+    "maxLogSize": 10485760,
+    "logKeepDays": 30
+  },
+  "maxStreamsLimit": 100
+}
