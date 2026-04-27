@@ -273,7 +273,7 @@ void SrtRouter::srtSendMsg(const SendTarget& target, const char* data, int size,
             auto& ctx = sit->second;
             ctx.sendTotalUs += elapsedUs;
             ctx.sendCount++;
-            ctx.sendMaxUs = std::max(ctx.sendMaxUs, elapsedUs); 
+            ctx.sendMaxUs = (std::max)(ctx.sendMaxUs, elapsedUs); 
 
             if (ret > 0) {
                 ctx.sentBytes += ret;
