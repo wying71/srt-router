@@ -10,6 +10,8 @@ on:
 jobs:
   buildWindows:
     runs-on: windows-latest
+    permissions:
+      contents: write    
             
     steps:
     - name: Checkout repository
@@ -91,9 +93,12 @@ jobs:
         allowUpdates: true
         prerelease: true
         tag: ${{ env.GIT_TAG }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
   buildLinux:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write    
     
     steps:
     - name: intall deps
@@ -162,3 +167,4 @@ jobs:
         allowUpdates: true
         prerelease: true
         tag: ${{ env.GIT_TAG }}
+        token: ${{ secrets.GITHUB_TOKEN }}
