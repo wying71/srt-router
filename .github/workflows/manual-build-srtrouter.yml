@@ -1,0 +1,170 @@
+name: Manual Build SRT Router
+
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Manual build'
+        # Default value if no value is explicitly provided
+        default: 'SRT Router'
+        # Input has to be provided for the workflow to run
+        required: false
+  
+jobs:
+  buildWindows:
+    runs-on: windows-latest
+            
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: get the version
+      id: get_version
+      shell: bash
+      run: |
+        GIT_VERSION=$(git describe)
+        echo "GIT_VERSION: $GIT_VERSION"
+        #GIT_TAG=$GIT_VERSION-$(git symbolic-ref --short -q HEAD)
+        GIT_REF=${{ github.ref }}
+        if [[ $GIT_REF == "refs/tags/"* ]]; then
+          GIT_TAG=${GIT_REF:10}-tag
+          echo "GIT_TAG: $GIT_TAG"
+          echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
+          echo "VERSION=${GIT_REF:10}-0-g$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        else
+          GIT_TAG=$GIT_VERSION-$(git symbolic-ref --short -q HEAD)
+          echo "GIT_TAG: $GIT_TAG"
+          echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
+          if [[ $GIT_VERSION =~ [0-9\.]+\-[0-9]+\-g[0-9a-f]+ ]]; then
+            echo "tag has rev."
+            echo "VERSION=$(git describe)" >> $GITHUB_ENV
+          else
+            echo "tag has no rev."
+            echo "VERSION=$(git describe)-0-g$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          fi
+        fi
+
+    - name: check the version
+      id: check_version
+      shell: bash
+      run: |
+        echo "env.GIT_TAG: ${{ env.GIT_TAG }}"
+        echo "env.VERSION: ${{ env.VERSION }}"
+
+    - name: Install CMake 3.28
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.28'
+      
+    - name: Install VS2019 Build Tools
+      run: |
+        curl -LO https://aka.ms/vs/16/release/vs_BuildTools.exe
+        Start-Process -FilePath .\vs_BuildTools.exe -ArgumentList `
+          '--quiet', '--wait', '--norestart', '--nocache', `
+          '--installPath', 'C:\BuildTools2019', `
+          '--add', 'Microsoft.VisualStudio.Workload.VCTools', `
+          '--add', 'Microsoft.VisualStudio.Component.VC.ATL', `
+          '--add', 'Microsoft.VisualStudio.Component.VC.Tools.x86.x64' `
+          -NoNewWindow -Wait            
+
+    - name: Add VS2019 to GITHUB PATH
+      run: echo "C:\BuildTools2019\MSBuild\Current\Bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
+       
+    - name: Verify VS2019 Version
+      shell: cmd
+      run: |
+        MSBuild /version
+         
+    - name: build package
+      shell: cmd
+      working-directory: ${{github.workspace}}
+      run: |
+        call build_srtrouter.bat
+        echo setupDir: %setupDir%
+        echo SETUP_PATH=%setupDir%>>%GITHUB_ENV%
+
+    - name: create release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "${{ env.SETUP_PATH }}/*.tgz"
+        generateReleaseNotes: true
+        allowUpdates: true
+        prerelease: true
+        tag: ${{ env.GIT_TAG }}
+
+  buildLinux:
+    runs-on: ubuntu-latest
+    container: docker.io/ubuntu-latest
+    
+    steps:
+    - name: intall deps
+      run: |
+        echo "install dev dependencies"
+        sudo apt install -y gcc g++ cmake git
+        echo $(gcc --version)
+        echo $(cmake --version)
+        echo $(git --version)
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: get the version
+      id: get_version
+      shell: bash
+      run: |
+        git config --global --add safe.directory $(pwd)
+        chmod -R 777 $(pwd)
+        GIT_VERSION=$(git describe)
+        echo "GIT_VERSION: $GIT_VERSION"
+        #GIT_TAG=$GIT_VERSION-$(git symbolic-ref --short -q HEAD)
+        GIT_REF=${{ github.ref }}
+        if [[ $GIT_REF == "refs/tags/"* ]]; then
+          GIT_TAG=${GIT_REF:10}-tag
+          echo "GIT_TAG: $GIT_TAG"
+          echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
+          echo "VERSION=${GIT_REF:10}-0-g$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        else
+          GIT_TAG=$GIT_VERSION-$(git symbolic-ref --short -q HEAD)
+          echo "GIT_TAG: $GIT_TAG"
+          echo "GIT_TAG=$GIT_TAG" >> $GITHUB_ENV
+          if [[ $GIT_VERSION =~ [0-9\.]+\-[0-9]+\-g[0-9a-f]+ ]]; then
+            echo "tag has rev."
+            echo "VERSION=$(git describe)" >> $GITHUB_ENV
+          else
+            echo "tag has no rev."
+            echo "VERSION=$(git describe)-0-g$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          fi
+        fi
+
+    - name: check the version
+      id: check_version
+      shell: bash
+      run: |
+        echo "env.GIT_TAG: ${{ env.GIT_TAG }}"
+        echo "env.VERSION: ${{ env.VERSION }}"
+
+    - name: build package
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        ./build_srtrouter.sh
+        curPath=$(pwd)
+        echo "curPath: $curPath"
+        echo "SETUP_PATH=$curPath" >> $GITHUB_ENV
+        
+    - name: create release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "${{ env.SETUP_PATH }}/*.tar.gz"
+        generateReleaseNotes: true
+        allowUpdates: true
+        prerelease: true
+        tag: ${{ env.GIT_TAG }}

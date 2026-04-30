@@ -25,6 +25,7 @@ srtrouterFile="srtrouter_${pkg_version}.tar.gz"
 echo "srtrouterFile: ${srtrouterFile}"
 cd ${curDir}/SrtRouter/build/bin
 tar vzcf ${curDir}/${srtrouterFile} * 
+cd ${curDir}
 
 echo "zip files successful."
 echo ${curDir}/${srtrouterFile}
