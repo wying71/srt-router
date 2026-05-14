@@ -1,12 +1,9 @@
 #ifndef SRTRECEIVE_H
 #define SRTRECEIVE_H
 
-#include "ace/OS.h"
-#include "ace/Date_Time.h"
 #include "srtSettings.h"
 #include "SrtSocket.h"
 #include <memory>
-#include "alignedmemory.h"
 #include <atomic>
 #include <mutex>
 #include <list>

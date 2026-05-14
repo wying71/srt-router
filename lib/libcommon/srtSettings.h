@@ -110,11 +110,11 @@ static inline bool parseSrtAddress(const std::string& host, int port, const SrtS
                 }
                 std::string bondUrl = std::get<0>(bondLink);
 #if 1
-				int indexHost = bondUrl.find("://");
+				size_t indexHost = bondUrl.find("://");
 				string strHost = bondUrl;
 				if(indexHost > 0)
 				{
-					int indexPort = bondUrl.find(":", indexHost + 3);
+					size_t indexPort = bondUrl.find(":", indexHost + 3);
 					if(indexPort > 0)
 					{
 						strHost = bondUrl.substr(indexHost + 3, indexPort - indexHost - 3);
